@@ -13,5 +13,13 @@ namespace BLK_Cat {
 		friend class EntityManager;
 		EntityID _entityID;
 	};
+
+	struct Drawable : public Component
+	{
+		Drawable()
+		{}
+
+		virtual ~Drawable() {}
+	};
 }
 

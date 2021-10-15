@@ -6,6 +6,7 @@
 #include "System.h"
 #include "Black_Cat/Components/Mesh.h"
 #include "Black_Cat/Components/Transform.h"
+#include "Black_Cat/Components/2D_primitives.h"
 
 #include <queue>
 #include <map>
@@ -65,7 +66,7 @@ namespace BLK_Cat
 			{
 				for (auto& entity : _entitiesSignature)
 				{
-					if (hasComponent<Mesh>(entity.first))
+					if (hasComponent<Drawable>(entity.first))
 					{
 						if(hasComponent<Transform>(entity.first))
 							system.second->draw(entity.first, getComponent<Transform>(entity.first)._model);

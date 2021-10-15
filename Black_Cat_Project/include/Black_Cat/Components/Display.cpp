@@ -14,9 +14,8 @@ Display::Display(int width, int height, std::string& tittle)
 	SDL_GL_SetAttribute(SDL_GL_BUFFER_SIZE, 32); //32 bit pallete, buffer de 32 bits
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
-	
-	//SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
-	//SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 4);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 4);
 
 	this->_window = SDL_CreateWindow(tittle.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_OPENGL);
 	this->_glContext = SDL_GL_CreateContext(this->_window);
