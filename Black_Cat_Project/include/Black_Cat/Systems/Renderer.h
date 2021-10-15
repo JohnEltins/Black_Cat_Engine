@@ -25,6 +25,8 @@ namespace BLK_Cat{
 			_manager->getComponent<Canvas>(entity)._display = new Display(_manager->getComponent<Canvas>(entity)._width,
 				_manager->getComponent<Canvas>(entity)._height,
 				_manager->getComponent<Canvas>(entity)._tittle);
+
+
 		}
 
 		void render(const EntityID entity) override
