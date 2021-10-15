@@ -45,6 +45,7 @@ namespace BLK_Cat
 		};
 
 		GLuint _VAO;
+		unsigned int _drawCount;
 		Vertex* _vertices;
 	};
 

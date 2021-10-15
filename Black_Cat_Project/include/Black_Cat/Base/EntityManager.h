@@ -66,7 +66,7 @@ namespace BLK_Cat
 			{
 				for (auto& entity : _entitiesSignature)
 				{
-					if (hasComponent<Drawable>(entity.first))
+					if (hasComponent<Drawable>(entity.first) && belongToSystem(entity.first, system.second->_signature))
 					{
 						if(hasComponent<Transform>(entity.first))
 							system.second->draw(entity.first, getComponent<Transform>(entity.first)._model);
