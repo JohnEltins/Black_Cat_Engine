@@ -16,5 +16,7 @@ namespace BLK_Cat {
 		glm::vec3 _scale;
 
 		glm::mat4 _model;
+
+		float count;
 	};
 }

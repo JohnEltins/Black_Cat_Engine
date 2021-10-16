@@ -12,23 +12,34 @@ namespace BLK_Cat {
 			: System(manager)
 		{
 			addComponentSignature<Transform>();
-			i = 0.0f;
 		}
 
 		void init(const EntityID entity) override
 		{
 			_manager->getComponent<Transform>(entity)._model = getModel(entity);
+			_manager->getComponent<Transform>(entity).count = 0.0f;
 		}
 
 		void update(const EntityID entity) override
 		{
-			setPos(entity, glm::vec3(cosf(i) / 2, sinf(i) / 2, 0.0f));
-			getRot(entity).x = i;
-			getRot(entity).y = i;
-			getRot(entity).z = i;
+			if (_manager->hasComponent<Quad>(entity))
+			{
+				setPos(entity, glm::vec3(sinf(_manager->getComponent<Transform>(entity).count) / 2, cosf(_manager->getComponent<Transform>(entity).count) / 2, 0.0f));
+				getRot(entity).x = -1 * _manager->getComponent<Transform>(entity).count;
+				getRot(entity).y = -1 * _manager->getComponent<Transform>(entity).count;
+				getRot(entity).z = -1 * _manager->getComponent<Transform>(entity).count;
+			}
+			else if (_manager->hasComponent<Triangle>(entity))
+			{
+				setPos(entity, glm::vec3(cosf(_manager->getComponent<Transform>(entity).count) / 2, sinf(_manager->getComponent<Transform>(entity).count) / 2, 0.0f));
+				getRot(entity).x = _manager->getComponent<Transform>(entity).count;
+				getRot(entity).y = _manager->getComponent<Transform>(entity).count;
+				getRot(entity).z = _manager->getComponent<Transform>(entity).count;
+			}
+			
 
+			_manager->getComponent<Transform>(entity).count += 0.035f;
 			_manager->getComponent<Transform>(entity)._model = getModel(entity);
-			i += 0.025;
 		}
 
 		glm::mat4 getModel(const ComponentTypeID entity)
@@ -56,7 +67,5 @@ namespace BLK_Cat {
 		void setPos(const ComponentTypeID entity, const glm::vec3& pos) { _manager->getComponent<Transform>(entity)._pos = pos; }
 		void setRot(const ComponentTypeID entity, const glm::vec3& rot) { _manager->getComponent<Transform>(entity)._rot = rot; }
 		void setScale(const ComponentTypeID entity, const glm::vec3& scale) { _manager->getComponent<Transform>(entity)._scale = scale; }
-
-		float i;
 	};
 }
