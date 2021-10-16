@@ -34,7 +34,7 @@ namespace BLK_Cat {
 		virtual void update(const ComponentTypeID entity) {}
 
 		virtual void render(const EntityID entity) {}
-		virtual void draw(const EntityID entity, glm::mat4 model) {}
+		virtual void draw(const EntityID entity) {}
 		virtual void destroy(){}
 
 	protected:

@@ -34,7 +34,7 @@ namespace BLK_Cat
 	{
 		Quad()
 		{
-
+			std::cout << "Quad" << std::endl;
 		}
 
 		enum {

@@ -19,6 +19,7 @@ namespace BLK_Cat {
 		void addComponent(Args&&... args)
 		{
 			_MGR->addComponent<T>(_ID, std::forward<Args>(args)...);
+			std::cout << "Componente adicionado" << std::endl;
 		}
 
 		template<typename T>
@@ -31,6 +32,7 @@ namespace BLK_Cat {
 		inline void removeComponent()
 		{
 			_MGR->removeComponent<T>(_ID);
+			std::cout << "Componente removido" << std::endl;
 		}
 
 		template<typename T>
@@ -44,7 +46,7 @@ namespace BLK_Cat {
 			_MGR->destroyEntity(_ID);
 		}
 
-	private:
+	protected:
 		EntityID _ID;
 		EntityManager* _MGR;
 	};

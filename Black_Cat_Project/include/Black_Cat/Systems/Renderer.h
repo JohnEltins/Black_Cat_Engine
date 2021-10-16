@@ -87,20 +87,24 @@ namespace BLK_Cat{
 		}
 
 
-		void draw(const EntityID entity, glm::mat4 model) override
+		void draw(const EntityID entity) override
 		{
-			glUseProgram(0);
-			glUseProgram(_manager->getComponent<Shader>(entity)._program);
+			if (_manager->hasComponent<Drawable>(entity)) 
+			{
+				glUseProgram(0);
+				glUseProgram(_manager->getComponent<Shader>(entity)._program);
 
-			glUniformMatrix4fv(_manager->getComponent<Shader>(entity)._uniforms[_manager->getComponent<Shader>(entity).UNIFORMS::TRANSFORM_U], 1, GL_FALSE, &model[0][0]);
+				glUniformMatrix4fv(_manager->getComponent<Shader>(entity)._uniforms[_manager->getComponent<Shader>(entity).UNIFORMS::TRANSFORM_U],
+					1, GL_FALSE, &_manager->getComponent<Transform>(entity)._model[0][0]);
 
-			glActiveTexture(GL_TEXTURE0); //setar textura de uma das 32 unidades
-			glBindTexture(GL_TEXTURE_2D, 0);
-			glBindTexture(GL_TEXTURE_2D, _manager->getComponent<Texture>(entity)._texture);
+				glActiveTexture(GL_TEXTURE0); //setar textura de uma das 32 unidades
+				glBindTexture(GL_TEXTURE_2D, 0);
+				glBindTexture(GL_TEXTURE_2D, _manager->getComponent<Texture>(entity)._texture);
 
-			glBindVertexArray(_manager->getComponent<Mesh>(entity)._vertexArrayObject);
-			glDrawArrays(GL_TRIANGLES, 0, _manager->getComponent<Mesh>(entity)._drawCount);
-			glBindVertexArray(0);
+				glBindVertexArray(_manager->getComponent<Mesh>(entity)._vertexArrayObject);
+				glDrawArrays(GL_TRIANGLES, 0, _manager->getComponent<Mesh>(entity)._drawCount);
+				glBindVertexArray(0);
+			}
 		}
 	};
 
