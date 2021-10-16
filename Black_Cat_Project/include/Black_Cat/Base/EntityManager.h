@@ -34,6 +34,7 @@ namespace BLK_Cat
 			{
 				for (auto& entity : _entitiesSignature)
 				{
+					//std::cout << "update" << std::endl;
 					if (belongToSystem(entity.first, system.second->getSignature()))
 						system.second->update(entity.first);
 				}
@@ -66,12 +67,9 @@ namespace BLK_Cat
 			{
 				for (auto& entity : _entitiesSignature)
 				{
-					if (hasComponent<Drawable>(entity.first) && belongToSystem(entity.first, system.second->_signature))
+					if (belongToSystem(entity.first, system.second->getSignature()))
 					{
-						if(hasComponent<Transform>(entity.first))
-							system.second->draw(entity.first, getComponent<Transform>(entity.first)._model);
-						else
-							system.second->draw(entity.first, glm::mat4(1.0));
+						system.second->draw(entity.first);
 					}
 				}
 			}
@@ -83,6 +81,7 @@ namespace BLK_Cat
 			addEntitySignature(entityID);
 			_availableEntities.pop();
 			_entityCount++;
+			std::cout << "entidade adicionada" << std::endl;
 			return entityID;
 		}
 
@@ -105,6 +104,7 @@ namespace BLK_Cat
 
 			_entityCount--;
 			_availableEntities.push(entity); //entidade vazia, apenas o id
+			std::cout << "entidade destruida" << std::endl;
 		}
 
 		template <typename T, typename... Args>
@@ -143,10 +143,27 @@ namespace BLK_Cat
 		}
 
 		template <typename T>
-		const bool hasComponent(const EntityID entity)
+		EntityID getFirstReference()
+		{
+			for (auto& entity : _entitiesSignature)
+			{
+				if (hasComponent<T>(entity.first))
+				{
+					return entity.first;
+				}
+			}
+
+
+			return -1;
+		}
+
+		template <typename T>
+		const int hasComponent(const EntityID entity)
 		{
 			assert(entity < MAX_ENTITIES && "Entity out of range");
-			return (getEntitySignature(entity)->count(CompType<T>()) > 0);
+			//return (getCompList<T>()->get(entity));
+			const ComponentTypeID compType = CompType<T>();
+			return (getEntitySignature(entity)->count(compType));
 		}
 
 		template <typename T>
@@ -159,9 +176,9 @@ namespace BLK_Cat
 			for (EntityID entity = 0; entity < _entityCount; entity++)
 			{
 				addEntityToSystem(entity, system.get());
-				// system->init(entity);
 			}
 
+			std::cout << "sistema registrado" << std::endl;
 			_regiteredSystems[systemType] = std::move(system);
 		}
 

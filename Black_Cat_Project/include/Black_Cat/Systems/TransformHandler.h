@@ -3,6 +3,7 @@
 #include "Black_Cat/Base/EntityManager.h"
 #include "Black_Cat/Components/Transform.h"
 #include "Black_Cat/Base/System.h"
+#include "Black_Cat/Base/Scene.h"
 
 namespace BLK_Cat {
 
@@ -16,6 +17,7 @@ namespace BLK_Cat {
 
 		void init(const EntityID entity) override
 		{
+			//std::cout << "transform init" << std::endl;
 			_manager->getComponent<Transform>(entity)._model = getModel(entity);
 			_manager->getComponent<Transform>(entity).count = 0.0f;
 		}
@@ -24,19 +26,19 @@ namespace BLK_Cat {
 		{
 			if (_manager->hasComponent<Quad>(entity))
 			{
-				setPos(entity, glm::vec3(sinf(_manager->getComponent<Transform>(entity).count) / 2, cosf(_manager->getComponent<Transform>(entity).count) / 2, 0.0f));
+				setPos(entity, glm::vec3(sinf(_manager->getComponent<Transform>(entity).count) / 2, cosf(_manager->getComponent<Transform>(entity).count) / 2, sinf(_manager->getComponent<Transform>(entity).count)*2));
 				getRot(entity).x = -1 * _manager->getComponent<Transform>(entity).count;
 				getRot(entity).y = -1 * _manager->getComponent<Transform>(entity).count;
 				getRot(entity).z = -1 * _manager->getComponent<Transform>(entity).count;
 			}
 			else if (_manager->hasComponent<Triangle>(entity))
 			{
-				setPos(entity, glm::vec3(cosf(_manager->getComponent<Transform>(entity).count) / 2, sinf(_manager->getComponent<Transform>(entity).count) / 2, 0.0f));
+				setPos(entity, glm::vec3(cosf(_manager->getComponent<Transform>(entity).count) / 2, sinf(_manager->getComponent<Transform>(entity).count) / 2, sinf(_manager->getComponent<Transform>(entity).count) * 2));
 				getRot(entity).x = _manager->getComponent<Transform>(entity).count;
 				getRot(entity).y = _manager->getComponent<Transform>(entity).count;
 				getRot(entity).z = _manager->getComponent<Transform>(entity).count;
 			}
-			
+
 
 			_manager->getComponent<Transform>(entity).count += 0.035f;
 			_manager->getComponent<Transform>(entity)._model = getModel(entity);
@@ -56,6 +58,7 @@ namespace BLK_Cat {
 
 			glm::mat4 rotMatrix = rotZMatrix * rotYMatrix * rotXMatrix;
 
+
 			//escala, gira e movimenta, nessa ordem
 			return posMatrix * rotMatrix * scaleMatrix;
 		}
@@ -67,5 +70,30 @@ namespace BLK_Cat {
 		void setPos(const ComponentTypeID entity, const glm::vec3& pos) { _manager->getComponent<Transform>(entity)._pos = pos; }
 		void setRot(const ComponentTypeID entity, const glm::vec3& rot) { _manager->getComponent<Transform>(entity)._rot = rot; }
 		void setScale(const ComponentTypeID entity, const glm::vec3& scale) { _manager->getComponent<Transform>(entity)._scale = scale; }
+	};
+
+	struct CameraHandler : public System
+	{
+		CameraHandler(EntityManager* manager)
+			: System(manager)
+		{
+			addComponentSignature<Camera>();
+		}
+
+		void init(const EntityID entity) override
+		{
+			_manager->getComponent<Camera>(entity)._viewProjection = getViewProjection(entity);
+		}
+
+		glm::mat4 getViewProjection(const ComponentTypeID entity)
+		{
+			//rotação da camera com perspectiva e movimento da camera
+			return _manager->getComponent<Camera>(entity)._perspective * glm::lookAt(_manager->getComponent<Camera>(entity)._pos,
+				_manager->getComponent<Camera>(entity)._pos + _manager->getComponent<Camera>(entity)._forward,
+				_manager->getComponent<Camera>(entity)._up);
+		}
+
+
+		void update(const EntityID entity) override {}
 	};
 }

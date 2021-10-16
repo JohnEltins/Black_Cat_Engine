@@ -25,16 +25,11 @@ namespace BLK_Cat
 				_manager->getComponent<Canvas>(entity)._tittle);
 		}
 
-		void render(const EntityID entity) 
+		void render(const EntityID entity) override
 		{
-			while (!_manager->getComponent<Canvas>(entity)._display->isClosed())
-			{
-				_manager->getComponent<Canvas>(entity)._display->clear(0.0f, 0.15f, 0.3f, 1.0f);
-				_manager->update();
-				_manager->draw();
-				_manager->getComponent<Canvas>(entity)._display->swapBuffers();
-
-			}
+			//std::cout << "Render2D" << std::endl;
+			_manager->draw();
+			_manager->update();
 		}
 	
 		void destroy() {}
@@ -99,20 +94,26 @@ namespace BLK_Cat
 		}
 
 
-		void draw(const EntityID entity, glm::mat4 model) override 
+		void draw(const EntityID entity) override 
 		{
-			glUseProgram(0);
-			glUseProgram(_manager->getComponent<Shader>(entity)._program);
+			if (_manager->hasComponent<Drawable>(entity))
+			{
+				glUseProgram(0);
+				glUseProgram(_manager->getComponent<Shader>(entity)._program);
 
-			glUniformMatrix4fv(_manager->getComponent<Shader>(entity)._uniforms[_manager->getComponent<Shader>(entity).UNIFORMS::TRANSFORM_U], 1, GL_FALSE, &model[0][0]);
+				glm::mat4 model = _manager->getComponent<Camera>(_manager->getFirstReference<Camera>())._viewProjection
+					* _manager->getComponent<Transform>(entity)._model;
 
-			glActiveTexture(GL_TEXTURE0); //setar textura de uma das 32 unidades
-			glBindTexture(GL_TEXTURE_2D, 0);
-			glBindTexture(GL_TEXTURE_2D, _manager->getComponent<Texture>(entity)._texture);
+				glUniformMatrix4fv(_manager->getComponent<Shader>(entity)._uniforms[_manager->getComponent<Shader>(entity).UNIFORMS::TRANSFORM_U], 1, GL_FALSE, &model[0][0]);
 
-			glBindVertexArray(_manager->getComponent<Triangle>(entity)._VAO);
-			glDrawArrays(GL_TRIANGLES, 0, _manager->getComponent<Triangle>(entity)._drawCount);
-			glBindVertexArray(0);
+				glActiveTexture(GL_TEXTURE0); //setar textura de uma das 32 unidades
+				glBindTexture(GL_TEXTURE_2D, 0);
+				glBindTexture(GL_TEXTURE_2D, _manager->getComponent<Texture>(entity)._texture);
+
+				glBindVertexArray(_manager->getComponent<Triangle>(entity)._VAO);
+				glDrawArrays(GL_TRIANGLES, 0, _manager->getComponent<Triangle>(entity)._drawCount);
+				glBindVertexArray(0);
+			}
 		}
 
 		void destroy() override  {}
@@ -124,10 +125,12 @@ namespace BLK_Cat
 			: System(manager)
 		{
 			addComponentSignature<Quad>();
+			std::cout << "quad signature" << std::endl;
 		}
 
 		void init(const EntityID entity) override
 		{
+			std::cout << "quad init" << std::endl;
 			Vertex vertices[] = {
 				Vertex(glm::vec3(0.5f,  0.5f, 0.0), glm::vec2(-1.0, -1.0)),
 				Vertex(glm::vec3(0.5f, -0.5f, 0.0), glm::vec2(1.0, -1.0)),
@@ -188,20 +191,26 @@ namespace BLK_Cat
 		}
 
 
-		void draw(const EntityID entity, glm::mat4 model) override 
+		void draw(const EntityID entity) override 
 		{
-			glUseProgram(0);
-			glUseProgram(_manager->getComponent<Shader>(entity)._program);
+			if (_manager->hasComponent<Drawable>(entity))
+			{
+				glUseProgram(0);
+				glUseProgram(_manager->getComponent<Shader>(entity)._program);
 
-			glUniformMatrix4fv(_manager->getComponent<Shader>(entity)._uniforms[_manager->getComponent<Shader>(entity).UNIFORMS::TRANSFORM_U], 1, GL_FALSE, &model[0][0]);
+				glm::mat4 model = _manager->getComponent<Camera>(_manager->getFirstReference<Camera>())._viewProjection
+					* _manager->getComponent<Transform>(entity)._model;
 
-			glActiveTexture(GL_TEXTURE0); //setar textura de uma das 32 unidades
-			glBindTexture(GL_TEXTURE_2D, 0);
-			glBindTexture(GL_TEXTURE_2D, _manager->getComponent<Texture>(entity)._texture);
+				glUniformMatrix4fv(_manager->getComponent<Shader>(entity)._uniforms[_manager->getComponent<Shader>(entity).UNIFORMS::TRANSFORM_U], 1, GL_FALSE, &model[0][0]);
 
-			glBindVertexArray(_manager->getComponent<Quad>(entity)._VAO);
-			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-			glBindVertexArray(0);
+				glActiveTexture(GL_TEXTURE0); //setar textura de uma das 32 unidades
+				glBindTexture(GL_TEXTURE_2D, 0);
+				glBindTexture(GL_TEXTURE_2D, _manager->getComponent<Texture>(entity)._texture);
+
+				glBindVertexArray(_manager->getComponent<Quad>(entity)._VAO);
+				glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+				glBindVertexArray(0);
+			}
 		}
 
 		void destroy() override {}
