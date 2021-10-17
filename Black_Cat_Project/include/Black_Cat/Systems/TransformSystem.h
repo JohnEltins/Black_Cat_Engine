@@ -1,9 +1,15 @@
 #pragma once
 
-#include "Black_Cat/Base/EntityManager.h"
-#include "Black_Cat/Components/Transform.h"
-#include "Black_Cat/Base/System.h"
-#include "Black_Cat/Base/Scene.h"
+#include "Black_Cat/Base/ECS.h"
+#include "Black_Cat/Components/RenderSystemComponents.h"
+
+
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/transform.hpp>
+
+
+
 
 namespace BLK_Cat {
 
@@ -34,6 +40,13 @@ namespace BLK_Cat {
 			else if (_manager->hasComponent<Triangle>(entity))
 			{
 				setPos(entity, glm::vec3(cosf(_manager->getComponent<Transform>(entity).count) / 2, sinf(_manager->getComponent<Transform>(entity).count) / 2, sinf(_manager->getComponent<Transform>(entity).count) * 2));
+				getRot(entity).x = _manager->getComponent<Transform>(entity).count;
+				getRot(entity).y = _manager->getComponent<Transform>(entity).count;
+				getRot(entity).z = _manager->getComponent<Transform>(entity).count;
+			}
+			else if (_manager->hasComponent<Mesh>(entity))
+			{
+				getPos(entity).z = sinf(_manager->getComponent<Transform>(entity).count) * 2;
 				getRot(entity).x = _manager->getComponent<Transform>(entity).count;
 				getRot(entity).y = _manager->getComponent<Transform>(entity).count;
 				getRot(entity).z = _manager->getComponent<Transform>(entity).count;

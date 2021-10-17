@@ -14,7 +14,6 @@ int main(int argc, char** argv)
     BLK_Cat::Scene* scene1 = new TestScene(blkCat->getEngineManager()->addNewEntity(), blkCat->getEngineManager(), WIDTH, HEIGHT);
 
     //blkCat->activateScene(scene1);
-
     blkCat->init();
    
     return 0;

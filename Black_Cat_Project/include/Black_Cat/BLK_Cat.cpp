@@ -7,7 +7,7 @@ Engine::Engine(int width, int height, std::string& tittle)
 	_canvas = new BLK_Cat::Entity(_mgr->addNewEntity(), _mgr);
 	_canvas->addComponent<BLK_Cat::Canvas>(width, height, tittle);
 
-	_mgr->registerSystem<BLK_Cat::Renderer2D>(_mgr);
+	_mgr->registerSystem<BLK_Cat::Renderer>(_mgr);
 }
 
 
