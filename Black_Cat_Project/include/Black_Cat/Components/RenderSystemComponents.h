@@ -6,52 +6,103 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/transform.hpp>
 
-
-#include "Black_Cat/Base/ECS.h"
 #include "Display.h"
 
 namespace BLK_Cat {
-	struct Canvas : public Component
-	{
+	/////////////////////////////////////////////////////////////////////
+	//////////////////////		Render Systems Components	 ////////////
+	/////////////////////////////////////////////////////////////////////
 
-		Canvas(uint32_t width, uint32_t height, std::string& tittle)
+	struct Vertex
+	{
+		Vertex(const glm::vec3& pos, const glm::vec2& textCoord)
 		{
-			_width = width;
-			_height = height;
-			_tittle = tittle;
-			_display = nullptr;
+			_pos = pos;
+			_textCoord = textCoord;
 		}
 
-		virtual ~Canvas() {}
+		glm::vec3 _pos;
+		glm::vec2 _textCoord;
+	};
 
-		uint32_t _width;
-		uint32_t _height;
-		std::string _tittle;
-		Display* _display;
+	struct Shader
+	{
+		Shader(const std::string& filename)
+		{
+			_filename = filename;
+		}
+
+		enum SHADERS
+		{
+			VertexShader, FragmentShader, NUM_SHADERS
+		};
+
+		enum UNIFORMS
+		{
+			TRANSFORM_U,
+
+			NUM_UNIFORMS
+		};
+
+
+		std::string _filename;
+		GLuint _program;
+		GLuint _shaders[SHADERS::NUM_SHADERS];
+		GLuint _uniforms[UNIFORMS::NUM_UNIFORMS];
+	};
+
+	struct Texture
+	{
+		Texture(const std::string& filename)
+		{
+			_filename = filename;
+		}
+
+
+		GLuint _texture;
+		std::string _filename;
+	};
+
+	struct Transform
+	{
+		Transform(const glm::vec3& pos = glm::vec3(), const glm::vec3& rot = glm::vec3(), const glm::vec3& scale = glm::vec3(0.2, 0.2, 1.0))
+			: _pos(pos), _rot(rot), _scale(scale), _model(glm::mat4(1.0f)), count(0.0f) {}
+
+		glm::vec3 _pos;
+		glm::vec3 _rot;
+		glm::vec3 _scale;
+
+		glm::mat4 _model;
+
+		float_t count;
+	};
+
+	struct Camera
+	{
+		Camera(const glm::vec3& pos, float_t fov, float_t aspect, float_t zNear, float_t zFar)
+		{
+			_perspective = glm::perspective(fov, aspect, zNear, zFar);
+			_pos = pos;
+
+			_forward = glm::vec3(0, 0, 1); //z axis
+			_up = glm::vec3(0, 1, 0); // y axis
+		}
+
+		glm::vec3 _pos;
+		glm::mat4 _perspective;
+		glm::mat4 _viewProjection;
+		//rotation
+		glm::vec3 _forward;
+		glm::vec3 _up;
 	};
 
 	/////////////////////////////////////////////////////////////////////
 	//////////////////////		Render Primitives	 ////////////////////
 	/////////////////////////////////////////////////////////////////////
 
-	class Vertex
-	{
-	public:
-		Vertex(const glm::vec3& pos, const glm::vec2& textCoord)
-		{
-			this->pos = pos;
-			this->textCoord = textCoord;
-		}
+	
 
-		inline glm::vec3* getPos() { return &pos; }
-		inline glm::vec2* getTextCoord() { return &textCoord; }
-
-	private:
-		glm::vec3 pos;
-		glm::vec2 textCoord;
-	};
-
-	struct Triangle : public Component
+	struct Triangle
 	{
 		Triangle()
 		{
@@ -72,11 +123,11 @@ namespace BLK_Cat {
 		Vertex* _vertices;
 	};
 
-	struct Quad : public Component
+	struct Quad
 	{
 		Quad()
 		{
-			std::cout << "Quad" << std::endl;
+			//std::cout << "Quad" << std::endl;
 		}
 
 		enum {
@@ -91,7 +142,7 @@ namespace BLK_Cat {
 		Vertex* _vertices;
 	};
 
-	struct Mesh : public Component
+	struct Mesh
 	{
 		Mesh(const Vertex* vertices, const uint32_t numVertices, const uint32_t* indices, const uint32_t numIndices)
 		{
@@ -136,84 +187,7 @@ namespace BLK_Cat {
 		uint32_t _numIndices; //draw count
 		uint32_t* _indices;
 		Vertex* _vertices;
-
 	};
 
-	/////////////////////////////////////////////////////////////////////
-	//////////////////////		Render Systems Components	 ////////////
-	/////////////////////////////////////////////////////////////////////
-
-	struct Shader : public Component
-	{
-		Shader(const std::string& filename)
-		{
-			_filename = filename;
-		}
-		virtual ~Shader() {}
-
-		enum SHADERS
-		{
-			VertexShader, FragmentShader, NUM_SHADERS
-		};
-
-		enum UNIFORMS
-		{
-			TRANSFORM_U,
-
-			NUM_UNIFORMS
-		};
-
-
-		std::string _filename;
-		GLuint _program;
-		GLuint _shaders[SHADERS::NUM_SHADERS];
-		GLuint _uniforms[UNIFORMS::NUM_UNIFORMS];
-	};
-
-	struct Texture : public Component
-	{
-		Texture(const std::string& filename)
-		{
-			_filename = filename;
-		}
-
-		virtual ~Texture() {}
-
-
-		GLuint _texture;
-		std::string _filename;
-	};
-
-	struct Transform : public Component
-	{
-		Transform(const glm::vec3& pos = glm::vec3(), const glm::vec3& rot = glm::vec3(), const glm::vec3& scale = glm::vec3(0.2, 0.2, 1.0))
-			: _pos(pos), _rot(rot), _scale(scale), _model(glm::mat4(1.0f)), count(0.0f) {}
-
-		glm::vec3 _pos;
-		glm::vec3 _rot;
-		glm::vec3 _scale;
-
-		glm::mat4 _model;
-
-		float_t count;
-	};
-
-	struct Camera : public Component
-	{
-		Camera(const glm::vec3& pos, float_t fov, float_t aspect, float_t zNear, float_t zFar)
-		{
-			_perspective = glm::perspective(fov, aspect, zNear, zFar);
-			_pos = pos;
-
-			_forward = glm::vec3(0, 0, 1); //z axis
-			_up = glm::vec3(0, 1, 0); // y axis
-		}
-
-		glm::vec3 _pos;
-		glm::mat4 _perspective;
-		glm::mat4 _viewProjection;
-		//rotation
-		glm::vec3 _forward;
-		glm::vec3 _up;
-	};
+	
 }

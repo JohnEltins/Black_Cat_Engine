@@ -1,32 +1,33 @@
 #pragma once
 
-#include "Systems/RenderSystem.h"
-#include "Systems/TransformSystem.h"
+//#include "Systems/RenderSystem.h"
+//#include "Systems/TransformSystem.h"
+#include "Black_Cat/Base/entt.hpp"
+#include "Components/Display.h"
 
 class Engine
 {
 public:
-	Engine(int width, int height, std::string& tittle);
-	~Engine();
+	inline static Engine* GetInstace(int width, int height, std::string& tittle)
+	{
+		return _instance = (_instance != nullptr) ? _instance : new Engine(width, height, tittle);
+	}
 
 	void init();
 
-	void activateScene(BLK_Cat::Scene* scene);
+	//void activateScene(BLK_Cat::Scene* scene);
 	void changeScene();
 	void closeScene();
-
-	inline BLK_Cat::EntityManager* getEngineManager() { return _mgr; }
-
-	void render();
 	void update(float dt);
 
-	BLK_Cat::EntityManager* _mgr;
-	BLK_Cat::Entity* _canvas;
-};
+private:
+	Engine(int width, int height, std::string& tittle);
+	~Engine();
 
-struct ActivateScene : BLK_Cat::Component
-{
-	ActivateScene() {}
-
-	virtual ~ActivateScene(){}
+	entt::registry _registry; //manager
+	uint32_t _width;
+	uint32_t _height;
+	std::string _tittle;
+	Display* _display;
+	static Engine* _instance;
 };

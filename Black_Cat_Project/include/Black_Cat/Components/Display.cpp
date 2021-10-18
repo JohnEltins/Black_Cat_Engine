@@ -2,6 +2,8 @@
 #include <GL/glew.h>
 #include <iostream>
 
+Display* Display::_instance = nullptr;
+
 Display::Display(int width, int height, std::string& tittle)
 {
 	SDL_Init(SDL_INIT_EVERYTHING);
@@ -28,7 +30,9 @@ Display::Display(int width, int height, std::string& tittle)
 		std::cerr << "Glew failed to initialize" << std::endl;
 	}
 
+	_keyStates = SDL_GetKeyboardState(nullptr);
 	this->_isClosed = false;
+	Tick();
 }
 
 Display::~Display()
@@ -38,28 +42,55 @@ Display::~Display()
 	SDL_Quit();
 }
 
-void Display::swapBuffers()
+void Display::SwapBuffers()
 {
 	SDL_GL_SwapWindow(_window);
-
-	SDL_Event e;
-
-	while (SDL_PollEvent(&e))
-	{
-		if (e.type == SDL_QUIT)
-		{
-			_isClosed = true;
-		}
-	}
 }
 
-bool Display::isClosed()
+bool Display::IsClosed()
 {
 	return _isClosed;
 }
 
-void Display::clear(float r, float g, float b, float a)
+void Display::Clear(float r, float g, float b, float a)
 {
 	glClearColor(r,g,b,a);
 	glClear(GL_COLOR_BUFFER_BIT);
+}
+
+void Display::Listener()
+{
+	SDL_Event e;
+
+	while (SDL_PollEvent(&e))
+	{
+		switch (e.type)
+		{
+		case SDL_QUIT: _isClosed = true; break;
+		case SDL_KEYDOWN: _keyStates = SDL_GetKeyboardState(nullptr); break;
+		case SDL_KEYUP: _keyStates = SDL_GetKeyboardState(nullptr); break;
+		default: break;
+		}
+	}
+}
+
+bool Display::GetKeyDown(SDL_Scancode key)
+{
+	return _keyStates[key];
+}
+
+void Display::Close()
+{
+	_isClosed = true;
+}
+
+void Display::Tick()
+{
+	_deltaTime = ((float)SDL_GetTicks() - _lastTime) * (TARGET_FPS / 1000.0f);
+	if (_deltaTime > TARGET_DELTA_TIME)
+		_deltaTime = 1.6f;
+
+	_lastTime = (float)SDL_GetTicks();
+
+	//std::cout << _deltaTime  << std::endl;
 }
