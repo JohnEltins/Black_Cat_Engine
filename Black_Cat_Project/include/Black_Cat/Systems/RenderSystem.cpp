@@ -381,7 +381,7 @@ std::string BLK_Cat::LoadShader(const std::string& fileName)
 		std::cerr << "Unable to Load shader: " << fileName << std::endl;
 	}
 
-	std::cout << output << std::endl;
+	//std::cout << output << std::endl;
 	return output;
 }
 

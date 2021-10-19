@@ -60,7 +60,7 @@ void BLK_Cat::TransformUpdade(entt::registry& registry, float dt, Display& displ
 		//tranform._pos.x = tranform._pos.x * 2.0f;
 
 
-		std::cout << tranform._pos.x << std::endl;
+		//std::cout << tranform._pos.x << std::endl;
 
 		//tranform._rot.x = -1 * tranform.count;
 		//tranform._rot.y = -1 * tranform.count;
@@ -134,7 +134,7 @@ void BLK_Cat::CameraUpdate(entt::registry& registry, Display& display ,float dt)
 		Camera& camera = view.get<Camera>(entity);
 
 		
-		if (display.GetMouseDown(Display::right)) {
+		if (display.GetMouseDown(Display::middle)) {
 
 			glm::vec2 move = glm::vec2((float)display.GetMousePosD().x, (float)display.GetMousePosD().y);
 			camera._pos.x += (dt * 0.005f) * move.x;
@@ -150,7 +150,7 @@ void BLK_Cat::CameraUpdate(entt::registry& registry, Display& display ,float dt)
 		CameraOrtho& camera = viewOrtho.get<CameraOrtho>(entity);
 		Transform& tranform = registry.get<Transform>(entity);
 
-		if (display.GetMouseDown(Display::right)) {
+		if (display.GetMouseDown(Display::middle)) {
 
 			glm::vec2 move = glm::vec2((float)display.GetMousePosD().x, (float)display.GetMousePosD().y);
 			camera._increment.x -= (dt * 0.5f) * move.x;

@@ -4,7 +4,7 @@
 
 void BLK_Cat::HelpSystemsUpdate(entt::registry& registry, float dt, Display& display)
 {
-	if (display.MousePressed(Display::left))
+	if (display.GetMouseDown(Display::right))
 	{
 		auto view = registry.view<Quad, Duplicate>();
 		for (auto entity : view)

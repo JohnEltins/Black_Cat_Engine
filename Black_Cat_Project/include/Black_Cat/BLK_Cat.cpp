@@ -3,6 +3,7 @@
 #include "Systems/TransformSystem.h"
 //#include "Components/RenderSystemComponents.h"
 
+
 Engine* Engine::_instance = nullptr;
 
 Engine::Engine(int width, int height, std::string& tittle)
@@ -68,13 +69,24 @@ void Engine::init()
 	BLK_Cat::RendererInit(_registry);
 	BLK_Cat::InitCameraHandler(_registry);
 	BLK_Cat::InitTransformHandler(_registry);
+	float counter = 0;
+	int Fps = 0;
+	int frames = 0;
 
 	//game loop
 	while (!_display->IsClosed())
 	{
+		frames++;
+		counter += _display->GetDeltaTime();
+
+		if (frames == 60)
+		{
+			Fps = counter;
+			frames = 0;
+			counter = 0;
+		}
 		_display->Listener();
 		_display->UpdateNow();
-
 
 		if (_display->KeyPressed(SDL_SCANCODE_ESCAPE))
 			_display->Close();
@@ -83,12 +95,20 @@ void Engine::init()
 
 		_display->Clear(0.0f, 0.15f, 0.3f, 1.0f);
 
+		_display->beginImgui();
+
+		//_display->renderImgui();
 		BLK_Cat::RendererDraw(_registry);
+		ImGui::Text("Game: %d", 3);
+		ImGui::Text("FPS: %d", Fps);
+
+		_display->endImgui();
 
 		_display->SwapBuffers();
 		_display->Tick();
+		//_display->Listener();
 		_display->UpdatePrev();
-
+		//std::cout << _display->IsClosed() << std::endl;
 	}
 }
 
@@ -117,3 +137,5 @@ void Engine::update(float dt)
 	BLK_Cat::CameraUpdate(_registry, *_display ,dt);
 	BLK_Cat::HelpSystemsUpdate(_registry, dt, *_display);
 }
+
+

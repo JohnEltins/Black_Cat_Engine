@@ -6,6 +6,7 @@
 #include "Components/Display.h"
 #include "Systems/HelpSystems.h"
 
+
 class Engine
 {
 public:
@@ -20,6 +21,7 @@ public:
 	void changeScene();
 	void closeScene();
 	void update(float dt);
+
 
 private:
 	Engine(int width, int height, std::string& tittle);
