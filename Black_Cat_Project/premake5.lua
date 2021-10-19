@@ -23,7 +23,9 @@ project "Black_Cat_Project"
 
     includedirs{
         "include",
-        "vendor/include"
+        "vendor/include",
+        "vendor/include/imgui-docking",
+        "vendor/include/SDL2"
     }
 
     libdirs{

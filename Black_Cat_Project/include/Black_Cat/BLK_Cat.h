@@ -4,6 +4,8 @@
 //#include "Systems/TransformSystem.h"
 #include "Black_Cat/Base/entt.hpp"
 #include "Components/Display.h"
+#include "Systems/HelpSystems.h"
+
 
 class Engine
 {
@@ -19,6 +21,7 @@ public:
 	void changeScene();
 	void closeScene();
 	void update(float dt);
+
 
 private:
 	Engine(int width, int height, std::string& tittle);

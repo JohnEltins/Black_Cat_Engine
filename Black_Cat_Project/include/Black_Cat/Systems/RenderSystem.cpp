@@ -45,7 +45,10 @@ void BLK_Cat::RendererInit(entt::registry& registry)
 void BLK_Cat::RendererDraw(entt::registry& registry)
 {
 	auto viewTriangle = registry.view<Triangle, Shader, Texture, Transform, Camera>();
+
 	auto viewQuad = registry.view<Quad, Shader, Texture, Transform, Camera>();
+	auto viewQuadOrtho = registry.view<Quad, Shader, Texture, Transform, CameraOrtho>();
+
 	auto viewMesh = registry.view<Mesh, Shader, Texture, Transform, Camera>();
 
 	for (auto entity : viewTriangle)
@@ -68,6 +71,17 @@ void BLK_Cat::RendererDraw(entt::registry& registry)
 		Camera& camera = viewQuad.get<Camera>(entity);
 
 		DrawQuad(quad, shader, texture, transform, camera);
+	}
+
+	for (auto entity : viewQuadOrtho)
+	{
+		Quad& quad = viewQuadOrtho.get<Quad>(entity);
+		Shader& shader = viewQuadOrtho.get<Shader>(entity);
+		Texture& texture = viewQuadOrtho.get<Texture>(entity);
+		Transform& transform = viewQuadOrtho.get<Transform>(entity);
+		CameraOrtho& camera = viewQuadOrtho.get<CameraOrtho>(entity);
+
+		DrawQuadOrtho(quad, shader, texture, transform, camera);
 	}
 
 
@@ -136,11 +150,20 @@ void BLK_Cat::CreateTriangle(Triangle& triangle)
 
 void BLK_Cat::CreateQuad(Quad& quad)
 {
+#if 0
 	Vertex vertices[] = {
 		Vertex(glm::vec3(0.5f,  0.5f, 0.0), glm::vec2(-1.0, -1.0)),
 		Vertex(glm::vec3(0.5f, -0.5f, 0.0), glm::vec2(1.0, -1.0)),
 		Vertex(glm::vec3(-0.5f,-0.5f, 0.0), glm::vec2(1.0, 1.0)),
 		Vertex(glm::vec3(-0.5f, 0.5f, 0.0), glm::vec2(-1.0, 1.0))
+	};
+#endif
+
+	Vertex vertices[] = {
+		Vertex(glm::vec3(1.0f,  1.0f, 0.0), glm::vec2(-1.0, -1.0)),
+		Vertex(glm::vec3(1.0f, -1.0f, 0.0), glm::vec2(1.0, -1.0)),
+		Vertex(glm::vec3(-1.0f,-1.0f, 0.0), glm::vec2(1.0, 1.0)),
+		Vertex(glm::vec3(-1.0f, 1.0f, 0.0), glm::vec2(-1.0, 1.0))
 	};
 
 	uint32_t indices[] = {
@@ -271,6 +294,24 @@ void BLK_Cat::DrawQuad(Quad& quad, Shader& shader, Texture& texture, Transform& 
 	glBindVertexArray(0);
 }
 
+void BLK_Cat::DrawQuadOrtho(Quad& quad, Shader& shader, Texture& texture, Transform& transform, CameraOrtho& camera)
+{
+	glUseProgram(0);
+	glUseProgram(shader._program);
+
+	glm::mat4 model = camera._viewOrtho * transform._model;
+
+	glUniformMatrix4fv(shader._uniforms[shader.UNIFORMS::TRANSFORM_U], 1, GL_FALSE, &model[0][0]);
+
+	glActiveTexture(GL_TEXTURE0); //setar textura de uma das 32 unidades
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glBindTexture(GL_TEXTURE_2D, texture._texture);
+
+	glBindVertexArray(quad._VAO);
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+	glBindVertexArray(0);
+}
+
 void BLK_Cat::DrawMesh(Mesh& mesh, Shader& shader, Texture& texture, Transform& transform, Camera& camera)
 {
 	glUseProgram(0);
@@ -340,7 +381,7 @@ std::string BLK_Cat::LoadShader(const std::string& fileName)
 		std::cerr << "Unable to Load shader: " << fileName << std::endl;
 	}
 
-	std::cout << output << std::endl;
+	//std::cout << output << std::endl;
 	return output;
 }
 

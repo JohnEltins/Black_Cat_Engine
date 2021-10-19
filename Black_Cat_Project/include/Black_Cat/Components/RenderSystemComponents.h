@@ -66,12 +66,12 @@ namespace BLK_Cat {
 	struct Transform
 	{
 		Transform(const glm::vec3& pos = glm::vec3(), const glm::vec3& rot = glm::vec3(), const glm::vec3& scale = glm::vec3(0.2, 0.2, 1.0))
-			: _pos(pos), _rot(rot), _scale(scale), _model(glm::mat4(1.0f)), count(0.0f) {}
+			: _pos(pos), _rot(rot), _scale(scale), _model(glm::mat4(1.0f)), count(0.0f), _spawn(pos) {}
 
 		glm::vec3 _pos;
 		glm::vec3 _rot;
 		glm::vec3 _scale;
-
+		glm::vec3 _spawn;
 		glm::mat4 _model;
 
 		float_t count;
@@ -79,7 +79,7 @@ namespace BLK_Cat {
 
 	struct Camera
 	{
-		Camera(const glm::vec3& pos, float_t fov, float_t aspect, float_t zNear, float_t zFar)
+		Camera(const glm::vec3& pos, float_t fov, float_t aspect, float_t zNear, float_t zFar) //perspective
 		{
 			_perspective = glm::perspective(fov, aspect, zNear, zFar);
 			_pos = pos;
@@ -94,6 +94,32 @@ namespace BLK_Cat {
 		//rotation
 		glm::vec3 _forward;
 		glm::vec3 _up;
+	};
+
+	struct CameraOrtho
+	{
+		CameraOrtho(float_t left, float_t right, float_t bottom, float_t top, float_t zNear, float_t zFar, glm::vec3 increment) //ortho
+		{
+			_increment = increment;
+
+			_cameraSet = glm::mat2x3();
+
+			_cameraSet[0][0] = left;
+			_cameraSet[0][1] = bottom;
+			_cameraSet[0][2] = zNear;
+
+			_cameraSet[1][0] = right;
+			_cameraSet[1][1] = top;
+			_cameraSet[1][2] = zFar;
+
+			_viewOrtho = glm::ortho(	left + _increment.x, right + _increment.x, 
+										bottom + _increment.y, top + _increment.y,
+										zNear + _increment.z, zFar + _increment.z);
+		}
+
+		glm::vec3 _increment;
+		glm::mat4 _viewOrtho;
+		glm::mat2x3 _cameraSet;
 	};
 
 	/////////////////////////////////////////////////////////////////////
@@ -140,6 +166,11 @@ namespace BLK_Cat {
 		GLuint _VAO;
 		uint32_t _numVertices;
 		Vertex* _vertices;
+	};
+
+	struct Duplicate
+	{
+		Duplicate(){}
 	};
 
 	struct Mesh

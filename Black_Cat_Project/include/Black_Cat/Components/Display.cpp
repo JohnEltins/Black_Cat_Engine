@@ -2,6 +2,10 @@
 #include <GL/glew.h>
 #include <iostream>
 
+
+const char* glsl_version = "#version 330";
+
+
 Display* Display::_instance = nullptr;
 
 Display::Display(int width, int height, std::string& tittle)
@@ -22,6 +26,9 @@ Display::Display(int width, int height, std::string& tittle)
 	this->_window = SDL_CreateWindow(tittle.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_OPENGL);
 	this->_glContext = SDL_GL_CreateContext(this->_window);
 
+	_width = width;
+	_height = height;
+
 	GLenum status = glewInit();
 
 	if (status != GLEW_OK)
@@ -36,6 +43,7 @@ Display::Display(int width, int height, std::string& tittle)
 
 	this->_isClosed = false;
 	Tick();
+	initImgui();
 }
 
 Display::~Display()
@@ -43,6 +51,10 @@ Display::~Display()
 	SDL_GL_DeleteContext(_glContext);
 	SDL_DestroyWindow(_window);
 	SDL_Quit();
+
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplSDL2_Shutdown();
+	ImGui::DestroyContext();
 }
 
 void Display::SwapBuffers()
@@ -69,12 +81,11 @@ void Display::Listener()
 	{
 		switch (e.type)
 		{
-		case SDL_QUIT: _isClosed = true; break;
-		case SDL_MOUSEWHEEL: 
-			std::cout << e.wheel.y << std::endl;
-			_scrollY = e.wheel.y;
-			break;
+		case SDL_QUIT: Close(); break;
+		case SDL_MOUSEWHEEL: _scrollY = e.wheel.y; break;
 		}
+
+		
 	}
 }
 
@@ -192,6 +203,66 @@ void Display::Tick()
 		_deltaTime = 1.6f;
 
 	_lastTime = (float)SDL_GetTicks();
+}
 
-	//std::cout << _deltaTime  << std::endl;
+void Display::initImgui()
+{
+	// Setup Dear ImGui context
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO(); (void)io;
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
+	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
+	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // Enable Multi-Viewport / Platform Windows
+	//io.ConfigViewportsNoAutoMerge = true;
+	//io.ConfigViewportsNoTaskBarIcon = true;
+
+	// Setup Dear ImGui style
+	ImGui::StyleColorsDark();
+	//ImGui::StyleColorsClassic();
+
+	// When viewports are enabled we tweak WindowRounding/WindowBg so platform windows can look identical to regular ones.
+	ImGuiStyle& style = ImGui::GetStyle();
+	if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+	{
+		style.WindowRounding = 0.0f;
+		style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+
+	}
+
+	// Setup Platform/Renderer backends
+	ImGui_ImplSDL2_InitForOpenGL(_window, _glContext);
+	ImGui_ImplOpenGL3_Init(glsl_version);
+}
+
+void Display::renderImgui()
+{
+	static bool show = true;
+	ImGui::ShowDemoWindow(&show);
+}
+
+void Display::beginImgui()
+{
+	ImGui_ImplOpenGL3_NewFrame();
+	ImGui_ImplSDL2_NewFrame();;
+	ImGui::NewFrame();
+}
+
+void Display::endImgui()
+{
+	ImGuiIO& io = ImGui::GetIO();
+	io.DisplaySize = ImVec2(float(GetScreenWidth()), float(GetScreenHeight()));
+
+	ImGui::Render();
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+	if (io.ConfigFlags | ImGuiConfigFlags_ViewportsEnable)
+	{
+		SDL_Window* backup = SDL_GL_GetCurrentWindow();
+		
+		ImGui::UpdatePlatformWindows();
+		ImGui::RenderPlatformWindowsDefault();
+		SDL_GL_MakeCurrent(backup, _glContext);
+	}
 }

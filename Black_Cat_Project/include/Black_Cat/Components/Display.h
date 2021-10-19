@@ -2,6 +2,9 @@
 #include <string>
 #include <SDL2/SDL.h>
 #include "glm/glm.hpp"
+#include "imgui.h"
+#include "backends/imgui_impl_sdl.h"
+#include "backends/imgui_impl_opengl3.h"
 
 const float TARGET_FPS = 60.0f;
 const float TARGET_DELTA_TIME = 1.5f;
@@ -40,6 +43,14 @@ public:
 	inline glm::vec2 GetMousePosD() { return glm::vec2(_dx, _dy); }
 	inline int MouseScroll() { return _scrollY; }
 
+	inline int GetScreenWidth() { return _width; }
+	inline int GetScreenHeight() { return _height; }
+
+	void initImgui();
+	void renderImgui();
+	void beginImgui();
+	void endImgui();
+
 
 	inline float GetDeltaTime() { return _deltaTime; }
 private:
@@ -56,6 +67,8 @@ private:
 	Uint32 _mouseState;
 	Uint32 _prevMouseState;
 
+	int _width;
+	int _height;
 
 	int _mouseX;
 	int _mouseY;
