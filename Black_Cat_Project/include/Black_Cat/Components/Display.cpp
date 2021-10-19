@@ -22,7 +22,6 @@ Display::Display(int width, int height, std::string& tittle)
 	this->_window = SDL_CreateWindow(tittle.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_OPENGL);
 	this->_glContext = SDL_GL_CreateContext(this->_window);
 
-
 	GLenum status = glewInit();
 
 	if (status != GLEW_OK)
@@ -30,7 +29,11 @@ Display::Display(int width, int height, std::string& tittle)
 		std::cerr << "Glew failed to initialize" << std::endl;
 	}
 
-	_keyStates = SDL_GetKeyboardState(nullptr);
+	_keyStates = SDL_GetKeyboardState(&_keyLenght);
+	_prevKeyStates = new Uint8[_keyLenght];
+	_scrollY = 0;
+	memcpy(_prevKeyStates, _keyStates, _keyLenght);
+
 	this->_isClosed = false;
 	Tick();
 }
@@ -67,16 +70,114 @@ void Display::Listener()
 		switch (e.type)
 		{
 		case SDL_QUIT: _isClosed = true; break;
-		case SDL_KEYDOWN: _keyStates = SDL_GetKeyboardState(nullptr); break;
-		case SDL_KEYUP: _keyStates = SDL_GetKeyboardState(nullptr); break;
-		default: break;
+		case SDL_MOUSEWHEEL: 
+			std::cout << e.wheel.y << std::endl;
+			_scrollY = e.wheel.y;
+			break;
 		}
 	}
+}
+
+void Display::UpdateNow()
+{
+	_mouseState = SDL_GetMouseState(&_mouseX, &_mouseY);
+	SDL_GetRelativeMouseState(&_dx, &_dy);
+	_keyStates = SDL_GetKeyboardState(&_keyLenght);
+}
+
+void Display::UpdatePrev()
+{
+	_prevMouseState = _mouseState;
+	memcpy(_prevKeyStates, _keyStates, _keyLenght);
+	_scrollY = 0;
 }
 
 bool Display::GetKeyDown(SDL_Scancode key)
 {
 	return _keyStates[key];
+}
+
+bool Display::KeyPressed(SDL_Scancode key)
+{
+	return !_prevKeyStates[key] && _keyStates[key];
+}
+
+bool Display::KeyRelesaed(SDL_Scancode key)
+{
+	return !_prevKeyStates[key] && _keyStates[key];
+}
+
+
+bool Display::GetMouseDown(MOUSE_BUTTON button)
+{
+	Uint32 mask = 0;
+	switch (button)
+	{
+	case left:
+		mask = SDL_BUTTON_LMASK;
+		break;
+	case right:
+		mask = SDL_BUTTON_RMASK;
+		break;
+	case  middle:
+		mask = SDL_BUTTON_MMASK;
+		break;
+	case back :
+		mask = SDL_BUTTON_X1MASK;
+		break;
+	case forward:
+		mask = SDL_BUTTON_X2MASK;
+	}
+
+	return (_mouseState & mask);
+}
+
+bool Display::MousePressed(MOUSE_BUTTON button)
+{
+	Uint32 mask = 0;
+	switch (button)
+	{
+	case left:
+		mask = SDL_BUTTON_LMASK;
+		break;
+	case right:
+		mask = SDL_BUTTON_RMASK;
+		break;
+	case  middle:
+		mask = SDL_BUTTON_MMASK;
+		break;
+	case back:
+		mask = SDL_BUTTON_X1MASK;
+		break;
+	case forward:
+		mask = SDL_BUTTON_X2MASK;
+	}
+
+	return !(_prevMouseState & mask) && (_mouseState & mask);
+}
+
+bool Display::MouseReleased(MOUSE_BUTTON button)
+{
+	Uint32 mask = 0;
+	switch (button)
+	{
+	case left:
+		mask = SDL_BUTTON_LMASK;
+		break;
+	case right:
+		mask = SDL_BUTTON_RMASK;
+		break;
+	case  middle:
+		mask = SDL_BUTTON_MMASK;
+		break;
+	case back:
+		mask = SDL_BUTTON_X1MASK;
+		break;
+	case forward:
+		mask = SDL_BUTTON_X2MASK;
+	}
+
+	return (_prevMouseState & mask) && !(_mouseState & mask);
 }
 
 void Display::Close()

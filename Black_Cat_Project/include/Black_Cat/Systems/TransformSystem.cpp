@@ -98,29 +98,16 @@ void BLK_Cat::CameraUpdate(entt::registry& registry, Display& display ,float dt)
 	auto view = registry.view<Camera>();
 	for (auto entity : view)
 	{
-		glm::vec2 move = glm::vec2((float)display.GetKeyDown(SDL_SCANCODE_RIGHT) - display.GetKeyDown(SDL_SCANCODE_LEFT),
-			(float)display.GetKeyDown(SDL_SCANCODE_DOWN) - display.GetKeyDown(SDL_SCANCODE_UP));
+		Camera& camera = view.get<Camera>(entity);
+		
+		if (display.GetMouseDown(Display::left)) {
 
-		float zoom = display.GetKeyDown(SDL_SCANCODE_PAGEUP) - display.GetKeyDown(SDL_SCANCODE_PAGEDOWN);
-
-		//move = glm::normalize(move);
-		if (move.x && move.y)
-		{
-			float x = move.x / sqrtf(pow(move.x, 2) + pow(move.y, 2));
-			float y = move.y / sqrtf(pow(move.x, 2) + pow(move.y, 2));
-			move.x = x;
-			move.y = y;
+			glm::vec2 move = glm::vec2((float)display.GetMousePosD().x, (float)display.GetMousePosD().y);
+			camera._pos.x += (dt * 0.005f) * move.x;
+			camera._pos.y += (dt * 0.005f) * move.y;
 		}
 		
-		std::cout << move.x << std::endl;
-		
-
-		Camera& camera = view.get<Camera>(entity);
-		camera._pos.x -= (dt * 0.05f) * move.x;
-		camera._pos.y -= (dt * 0.05f) * move.y;
-		camera._pos.z += (dt * 0.08f) * zoom;
-
-
+		camera._pos.z += (dt * 0.5f) * (float)display.MouseScroll();
 		camera._viewProjection = GetViewProjection(camera);
 	}
 }

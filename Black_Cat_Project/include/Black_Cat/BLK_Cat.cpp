@@ -69,6 +69,8 @@ void Engine::init()
 	while (!_display->IsClosed())
 	{
 		_display->Listener();
+		_display->UpdateNow();
+
 
 		if (_display->GetKeyDown(SDL_SCANCODE_ESCAPE))
 			_display->Close();
@@ -81,6 +83,8 @@ void Engine::init()
 
 		_display->SwapBuffers();
 		_display->Tick();
+		_display->UpdatePrev();
+
 	}
 }
 
@@ -105,7 +109,14 @@ void Engine::closeScene()
 
 void Engine::update(float dt)
 {
+
 	//std::cout << dt << std::endl;
 	BLK_Cat::TransformUpdade(_registry, dt);
 	BLK_Cat::CameraUpdate(_registry, *_display ,dt);
+
+	if(_display->GetMouseDown(Display::middle)) std::cout << "middle" << std::endl;
+	if (_display->MousePressed(Display::left)) std::cout << "left" << std::endl;
+	if (_display->MouseReleased(Display::right)) std::cout << "right" << std::endl;
+
+
 }
