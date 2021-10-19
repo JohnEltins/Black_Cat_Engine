@@ -3,8 +3,8 @@
 #include <Black_Cat/BLK_Cat.h>
 //#include "../res/Scenes/TestScene.h"
 
-#define WIDTH 800
-#define HEIGHT 600
+#define WIDTH 960
+#define HEIGHT 540
 
 int main(int argc, char** argv)
 {

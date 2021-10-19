@@ -40,6 +40,11 @@ public:
 	inline glm::vec2 GetMousePosD() { return glm::vec2(_dx, _dy); }
 	inline int MouseScroll() { return _scrollY; }
 
+	inline int GetScreenWidth() { return _width; }
+	inline int GetScreenHeight() { return _height; }
+
+
+
 
 	inline float GetDeltaTime() { return _deltaTime; }
 private:
@@ -56,6 +61,8 @@ private:
 	Uint32 _mouseState;
 	Uint32 _prevMouseState;
 
+	int _width;
+	int _height;
 
 	int _mouseX;
 	int _mouseY;

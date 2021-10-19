@@ -22,6 +22,9 @@ Display::Display(int width, int height, std::string& tittle)
 	this->_window = SDL_CreateWindow(tittle.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_OPENGL);
 	this->_glContext = SDL_GL_CreateContext(this->_window);
 
+	_width = width;
+	_height = height;
+
 	GLenum status = glewInit();
 
 	if (status != GLEW_OK)
@@ -70,10 +73,7 @@ void Display::Listener()
 		switch (e.type)
 		{
 		case SDL_QUIT: _isClosed = true; break;
-		case SDL_MOUSEWHEEL: 
-			std::cout << e.wheel.y << std::endl;
-			_scrollY = e.wheel.y;
-			break;
+		case SDL_MOUSEWHEEL: _scrollY = e.wheel.y; break;
 		}
 	}
 }
@@ -192,6 +192,4 @@ void Display::Tick()
 		_deltaTime = 1.6f;
 
 	_lastTime = (float)SDL_GetTicks();
-
-	//std::cout << _deltaTime  << std::endl;
 }

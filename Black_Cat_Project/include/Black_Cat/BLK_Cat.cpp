@@ -33,12 +33,15 @@ void Engine::init()
 	_registry.emplace<BLK_Cat::Camera>(tri, glm::vec3(0, 0, -3), 70.0f, (float)_width / (float)_height, 0.01f, 1000.0f);
 	_registry.emplace<BLK_Cat::Texture>(tri, "./res/bricks.jpg");
 
-	
+	float width = 50.0f;
+	float height = 50.0f;
+
 	entt::entity quad = _registry.create();
 	_registry.emplace<BLK_Cat::Quad>(quad);
 	_registry.emplace<BLK_Cat::Shader>(quad, "./res/textureShader");
-	_registry.emplace<BLK_Cat::Transform>(quad, glm::vec3(), glm::vec3(), glm::vec3(0.5, 0.5, 1.0));
-	_registry.emplace<BLK_Cat::Camera>(quad, glm::vec3(0, 0, -3), 70.0f, (float)_width / (float)_height, 0.01f, 1000.0f);
+	_registry.emplace<BLK_Cat::Transform>(quad, glm::vec3(_width/2, _height/2, 0), glm::vec3(), glm::vec3(width, height, 1.0));
+	_registry.emplace<BLK_Cat::CameraOrtho>(quad, (float_t)0, (float_t)_width, (float_t)0, (float_t)_height, -1.0f, 1.0f, glm::vec3());
+	_registry.emplace<BLK_Cat::Duplicate>(quad);
 	_registry.emplace<BLK_Cat::Texture>(quad, "./res/bricks.jpg");
 
 	BLK_Cat::Vertex vertices[] = {
@@ -59,6 +62,7 @@ void Engine::init()
 	_registry.emplace<BLK_Cat::Shader>(mesh, "./res/textureShader");
 	_registry.emplace<BLK_Cat::Transform>(mesh, glm::vec3(), glm::vec3(), glm::vec3(0.5, 0.5, 1.0));
 	_registry.emplace<BLK_Cat::Camera>(mesh, glm::vec3(0, 0, -3), 70.0f, (float)_width / (float)_height, 0.01f, 1000.0f);
+
 	_registry.emplace<BLK_Cat::Texture>(mesh, "./res/bricks.jpg");
 	
 	BLK_Cat::RendererInit(_registry);
@@ -72,7 +76,7 @@ void Engine::init()
 		_display->UpdateNow();
 
 
-		if (_display->GetKeyDown(SDL_SCANCODE_ESCAPE))
+		if (_display->KeyPressed(SDL_SCANCODE_ESCAPE))
 			_display->Close();
 
 		update(_display->GetDeltaTime());
@@ -109,14 +113,7 @@ void Engine::closeScene()
 
 void Engine::update(float dt)
 {
-
-	//std::cout << dt << std::endl;
-	BLK_Cat::TransformUpdade(_registry, dt);
+	BLK_Cat::TransformUpdade(_registry, dt, *_display);
 	BLK_Cat::CameraUpdate(_registry, *_display ,dt);
-
-	if(_display->GetMouseDown(Display::middle)) std::cout << "middle" << std::endl;
-	if (_display->MousePressed(Display::left)) std::cout << "left" << std::endl;
-	if (_display->MouseReleased(Display::right)) std::cout << "right" << std::endl;
-
-
+	BLK_Cat::HelpSystemsUpdate(_registry, dt, *_display);
 }

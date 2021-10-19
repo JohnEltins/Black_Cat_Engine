@@ -9,10 +9,12 @@
 
 namespace BLK_Cat {
 	void InitTransformHandler(entt::registry& registry);
-	void TransformUpdade(entt::registry& registry, float dt);
+	void TransformUpdade(entt::registry& registry, float dt, Display& display);
 	glm::mat4 GetModel(Transform& transform);
 
 	void InitCameraHandler(entt::registry& registry);
 	void CameraUpdate(entt::registry& registry, Display& display ,float dt);
 	glm::mat4 GetViewProjection(Camera& camera);
+	glm::mat4 GetViewOrtho(CameraOrtho& camera);
+
 }
