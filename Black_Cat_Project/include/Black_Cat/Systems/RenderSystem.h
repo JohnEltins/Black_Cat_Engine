@@ -22,6 +22,7 @@ namespace BLK_Cat
 	void CreateQuad(Quad& quad);
 	void CreateMesh(Mesh& mesh);
 
+
 	void DrawTriangle(Triangle& triangle, Shader& shader, Texture& texture, Transform& transform, Camera& camera);
 	void DrawQuad(Quad& quad, Shader& shader, Texture& texture, Transform& transform, Camera& camera);
 	void DrawQuadOrtho(Quad& quad, Shader& shader, Texture& texture, Transform& transform, CameraOrtho& camera);

@@ -7,16 +7,6 @@ void BLK_Cat::RendererInit(entt::registry& registry)
 	auto viewQuad = registry.view <Quad>();
 	auto viewMesh = registry.view <Mesh>();
 
-	for (auto entity : viewTriangle)
-	{
-		Triangle& triangle = viewTriangle.get<Triangle>(entity);
-		Shader& shader = registry.get<Shader>(entity);
-		Texture& texture = registry.get<Texture>(entity);
-		CreateTriangle(triangle);
-		InitShaderHandler(shader);
-		InitTextureHandler(texture);
-	}
-
 	for (auto entity : viewQuad)
 	{
 		Quad& quad = viewQuad.get<Quad>(entity);
@@ -27,11 +17,23 @@ void BLK_Cat::RendererInit(entt::registry& registry)
 		InitTextureHandler(texture);
 	}
 
+	for (auto entity : viewTriangle)
+	{
+		Triangle& triangle = viewTriangle.get<Triangle>(entity);
+		Shader& shader = registry.get<Shader>(entity);
+		Texture& texture = registry.get<Texture>(entity);
+		CreateTriangle(triangle);
+		InitShaderHandler(shader);
+		InitTextureHandler(texture);
+	}
+
 	for (auto entity : viewMesh)
 	{
 		Mesh& mesh = viewMesh.get<Mesh>(entity);
 		Shader& shader = registry.get<Shader>(entity);
 		Texture& texture = registry.get<Texture>(entity);
+
+
 		CreateMesh(mesh);
 		InitShaderHandler(shader);
 		InitTextureHandler(texture);
@@ -51,16 +53,6 @@ void BLK_Cat::RendererDraw(entt::registry& registry)
 
 	auto viewMesh = registry.view<Mesh, Shader, Texture, Transform, Camera>();
 
-	for (auto entity : viewTriangle)
-	{
-		Triangle& triangle = viewTriangle.get<Triangle>(entity);
-		Shader& shader = viewTriangle.get<Shader>(entity);
-		Texture& texture = viewTriangle.get<Texture>(entity);
-		Transform& transform = viewTriangle.get<Transform>(entity);
-		Camera& camera = viewTriangle.get<Camera>(entity);
-
-		DrawTriangle(triangle, shader, texture, transform, camera);
-	}
 
 	for (auto entity : viewQuad)
 	{
@@ -84,6 +76,16 @@ void BLK_Cat::RendererDraw(entt::registry& registry)
 		DrawQuadOrtho(quad, shader, texture, transform, camera);
 	}
 
+	for (auto entity : viewTriangle)
+	{
+		Triangle& triangle = viewTriangle.get<Triangle>(entity);
+		Shader& shader = viewTriangle.get<Shader>(entity);
+		Texture& texture = viewTriangle.get<Texture>(entity);
+		Transform& transform = viewTriangle.get<Transform>(entity);
+		Camera& camera = viewTriangle.get<Camera>(entity);
+
+		DrawTriangle(triangle, shader, texture, transform, camera);
+	}
 
 	for (auto entity : viewMesh)
 	{
@@ -223,37 +225,25 @@ void BLK_Cat::CreateMesh(Mesh& mesh)
 	glGenVertexArrays(1, &mesh._vertexArrayObject);
 	glBindVertexArray(mesh._vertexArrayObject);
 
-	std::vector<glm::vec3> positions;
-	std::vector<glm::vec2> texture;
-
-	positions.reserve(mesh._numVertices);
-	texture.reserve(mesh._numVertices);
-
-	for (uint32_t i = 0; i < mesh._numVertices; i++)
-	{
-		positions.push_back(mesh._vertices[i]._pos);
-		texture.push_back(mesh._vertices[i]._textCoord);
-	}
-
 	glGenBuffers(mesh.NUM_BUFFERS, mesh._vertexArrayBuffers);
 
 	//buffer de vertices
 	glBindBuffer(GL_ARRAY_BUFFER, mesh._vertexArrayBuffers[mesh.POSITION_VB]);
-	glBufferData(GL_ARRAY_BUFFER, mesh._numVertices * sizeof(positions[0]), &positions[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, mesh._model.positions.size() * sizeof(mesh._model.positions[0]), &mesh._model.positions[0], GL_STATIC_DRAW);
 
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
 	//buffer de textCoord
 	glBindBuffer(GL_ARRAY_BUFFER, mesh._vertexArrayBuffers[mesh.TEXTCOORD_VB]);
-	glBufferData(GL_ARRAY_BUFFER, mesh._numVertices * sizeof(texture[0]), &texture[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, mesh._model.positions.size() * sizeof(mesh._model.texCoords[0]), &mesh._model.texCoords[0], GL_STATIC_DRAW);
 
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, 0);
 
 	//index buffer
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh._vertexArrayBuffers[mesh.INDEX_VB]);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh._numIndices * sizeof(mesh._indices[0]), &mesh._indices[0], GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh._model.indices.size() * sizeof(mesh._model.indices[0]), &mesh._model.indices[0], GL_STATIC_DRAW);
 
 	glBindVertexArray(0);
 }
@@ -328,7 +318,7 @@ void BLK_Cat::DrawMesh(Mesh& mesh, Shader& shader, Texture& texture, Transform& 
 
 
 	glBindVertexArray(mesh._vertexArrayObject);
-	glDrawElements(GL_TRIANGLES, mesh._numIndices, GL_UNSIGNED_INT, 0);
+	glDrawElements(GL_TRIANGLES, mesh._model.indices.size(), GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
 }
 

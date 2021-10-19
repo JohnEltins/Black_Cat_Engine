@@ -8,6 +8,8 @@
 
 #include "Display.h"
 
+#include "obj_loader.h"
+
 namespace BLK_Cat {
 	/////////////////////////////////////////////////////////////////////
 	//////////////////////		Render Systems Components	 ////////////
@@ -175,31 +177,28 @@ namespace BLK_Cat {
 
 	struct Mesh
 	{
+		Mesh(const std::string& filename)
+		{
+			_model = OBJModel(filename).ToIndexedModel();
+		}
+
 		Mesh(const Vertex* vertices, const uint32_t numVertices, const uint32_t* indices, const uint32_t numIndices)
 		{
 			_vertexArrayObject = 0;
+
 			for (uint32_t i = 0; i < NUM_BUFFERS; i++)
 				_vertexArrayBuffers[i] = GLuint(0);
 
-
-			//_vertices = new Vertex[numIndices];
-			_numVertices = numVertices;
-
-			//_indices = indices;
-			_vertices = (Vertex*)malloc(numVertices * sizeof(vertices[0]));
-			_indices = (uint32_t*)malloc(numIndices * sizeof(indices[0]));
-
 			for (uint32_t i = 0; i < numVertices; i++)
 			{
-				_vertices[i] = vertices[i];
+				_model.positions.push_back(vertices[i]._pos);
+				_model.texCoords.push_back(vertices[i]._textCoord);
 			}
 
 			for (uint32_t i = 0; i < numIndices; i++)
 			{
-				_indices[i] = indices[i];
+				_model.indices.push_back(indices[i]);
 			}
-
-			_numIndices = numIndices;
 		}
 
 		virtual ~Mesh() {}
@@ -214,10 +213,7 @@ namespace BLK_Cat {
 
 		GLuint _vertexArrayObject;
 		GLuint _vertexArrayBuffers[NUM_BUFFERS];
-		uint32_t _numVertices;
-		uint32_t _numIndices; //draw count
-		uint32_t* _indices;
-		Vertex* _vertices;
+		IndexedModel _model;
 	};
 
 	

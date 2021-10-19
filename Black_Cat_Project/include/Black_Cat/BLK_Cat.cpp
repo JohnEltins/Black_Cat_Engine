@@ -27,13 +27,6 @@ static void strs(int a)
 
 void Engine::init()
 {
-	entt::entity tri = _registry.create();
-	_registry.emplace<BLK_Cat::Triangle>(tri);
-	_registry.emplace<BLK_Cat::Shader>(tri, "./res/solidColorShader");
-	_registry.emplace<BLK_Cat::Transform>(tri, glm::vec3(), glm::vec3(), glm::vec3(0.5, 0.5, 1.0));
-	_registry.emplace<BLK_Cat::Camera>(tri, glm::vec3(0, 0, -3), 70.0f, (float)_width / (float)_height, 0.01f, 1000.0f);
-	_registry.emplace<BLK_Cat::Texture>(tri, "./res/bricks.jpg");
-
 	float width = 50.0f;
 	float height = 50.0f;
 
@@ -44,6 +37,15 @@ void Engine::init()
 	_registry.emplace<BLK_Cat::CameraOrtho>(quad, (float_t)0, (float_t)_width, (float_t)0, (float_t)_height, -1.0f, 1.0f, glm::vec3());
 	_registry.emplace<BLK_Cat::Duplicate>(quad);
 	_registry.emplace<BLK_Cat::Texture>(quad, "./res/bricks.jpg");
+
+	
+	entt::entity tri = _registry.create();
+	_registry.emplace<BLK_Cat::Triangle>(tri);
+	_registry.emplace<BLK_Cat::Shader>(tri, "./res/solidColorShader");
+	_registry.emplace<BLK_Cat::Transform>(tri, glm::vec3(0.9,0.0,0.0), glm::vec3(), glm::vec3(0.5, 0.5, 1.0));
+	_registry.emplace<BLK_Cat::Camera>(tri, glm::vec3(0, 0, -3), 70.0f, (float)_width / (float)_height, 0.01f, 1000.0f);
+	_registry.emplace<BLK_Cat::Texture>(tri, "./res/bricks.jpg");
+
 
 	BLK_Cat::Vertex vertices[] = {
 				BLK_Cat::Vertex(glm::vec3(-0.5f, -0.5f, 0.0), glm::vec2(0.0, 0.0)),
@@ -56,15 +58,20 @@ void Engine::init()
 	};
 
 	entt::entity mesh = _registry.create();
-	_registry.emplace<BLK_Cat::Mesh>(mesh, vertices, 
-		sizeof(vertices) / sizeof(vertices[0]), 
-		indices, sizeof(indices) / sizeof(indices[0]));
-
+	_registry.emplace<BLK_Cat::Mesh>(mesh, "./res/monkey3.obj");
 	_registry.emplace<BLK_Cat::Shader>(mesh, "./res/textureShader");
 	_registry.emplace<BLK_Cat::Transform>(mesh, glm::vec3(), glm::vec3(), glm::vec3(0.5, 0.5, 1.0));
 	_registry.emplace<BLK_Cat::Camera>(mesh, glm::vec3(0, 0, -3), 70.0f, (float)_width / (float)_height, 0.01f, 1000.0f);
-
 	_registry.emplace<BLK_Cat::Texture>(mesh, "./res/bricks.jpg");
+
+	entt::entity mesh2 = _registry.create();
+	_registry.emplace<BLK_Cat::Mesh>(mesh2, vertices,
+		sizeof(vertices) / sizeof(vertices[0]),
+		indices, sizeof(indices) / sizeof(indices[0]));
+	_registry.emplace<BLK_Cat::Shader>(mesh2, "./res/textureShader");
+	_registry.emplace<BLK_Cat::Transform>(mesh2, glm::vec3(-1.0,0.0,0.0), glm::vec3(), glm::vec3(0.5, 0.5, 1.0));
+	_registry.emplace<BLK_Cat::Camera>(mesh2, glm::vec3(0, 0, -3), 70.0f, (float)_width / (float)_height, 0.01f, 1000.0f);
+	_registry.emplace<BLK_Cat::Texture>(mesh2, "./res/bricks.jpg");
 	
 	BLK_Cat::RendererInit(_registry);
 	BLK_Cat::InitCameraHandler(_registry);
